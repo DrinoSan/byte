@@ -5,10 +5,10 @@
 int main( int argc, const char* argv[] )
 {
     Chunk chunk;
-    for(int i = 0; i < 270; ++i)
+    for ( int i = 0; i < 270; ++i )
     {
-        int   constant = chunk.addConstant( i );
-        chunk.writeConstant(i, i + 10);
+        // int   constant = chunk.addConstant( i );
+        chunk.writeConstant( i, i * 10 );
     }
 
     chunk.writeChunk( OP_RETURN, 123 );
