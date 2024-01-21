@@ -4,6 +4,7 @@
 #include "memory.h"
 #include "value.h"
 #include <_types/_uint32_t.h>
+#include <sys/_types/_int32_t.h>
 #include <sys/_types/_int8_t.h>
 
 enum OpCode
@@ -44,7 +45,7 @@ class Chunk
         count++;
     }
 
-    void writeConstant( Value value, int line );
+    int32_t writeConstant( Value value, int line );
 
     int     addConstant( Value value );
     uint8_t getOpCodebyOffset( int offset );
