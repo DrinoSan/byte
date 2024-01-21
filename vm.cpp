@@ -21,11 +21,13 @@ void VM::initVM()
 
 void VM::freeVM() {}
 
-InterpretResult VM::interpret( Chunk* chunk_ )
+InterpretResult VM::interpret( const char* source )
 {
-    chunk = chunk_;
-    ip    = chunk->code;
-    return run();
+    compiler.compile( source );
+    return InterpretResult::INTERPRET_OK;
+    // chunk = chunk_;
+    // ip    = chunk->code;
+    // return run();
 }
 
 void VM::resetStack()

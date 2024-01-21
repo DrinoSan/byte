@@ -1,6 +1,7 @@
 #pragma once
 
 #include "chunk.h"
+#include "compiler.h"
 #include "value.h"
 
 #define STACK_MAX 256
@@ -29,7 +30,7 @@ class VM
     void push(Value value);
     Value pop();
 
-    InterpretResult interpret( Chunk* chunk_ );
+    InterpretResult interpret( const char* source );
     InterpretResult run();
 
     static VM& getInstance()
@@ -43,4 +44,5 @@ class VM
     uint8_t* ip;
     Value    stack[ STACK_MAX ];
     Value*   stackTop;
+    Compiler compiler;
 };

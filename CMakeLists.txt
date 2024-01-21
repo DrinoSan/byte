@@ -13,4 +13,11 @@ set(CMAKE_CXX_COMPILER clang++)
 
 
 # Create the executable target
-add_executable(main main.cpp chunk.cpp memory.cpp debug.cpp value.cpp vm.cpp)
+add_executable(main main.cpp
+                    chunk.cpp
+                    memory.cpp
+                    debug.cpp
+                    value.cpp
+                    vm.cpp
+                    scanner.cpp
+                    compiler.cpp)
