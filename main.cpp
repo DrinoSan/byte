@@ -19,12 +19,6 @@ int main( int argc, const char* argv[] )
     chunk.writeChunk(OP_DIVIDE, 123);
     chunk.writeChunk(OP_NEGATE, 123);
 
-    // for ( int i = 0; i < 270; ++i )
-    // {
-    //     // int   constant = chunk.addConstant( i );
-    //     chunk.writeConstant( i, i * 10 );
-    // }
-
     chunk.writeChunk( OP_RETURN, 123 );
 
     disassembleChunk( &chunk, "test chunk" );
