@@ -39,24 +39,24 @@ class Chunk
         count++;
     }
 
-    void writeConstant(Value value, int line);
+    void writeConstant( Value value, int line );
 
     int     addConstant( Value value );
     uint8_t getOpCodebyOffset( int offset );
 
-    int8_t   getConstantIndexByOpCodeOffset( int offset );
-    Value getConstantsValues( int constant );
+    int8_t getConstantIndexByOpCodeOffset( int offset );
+    Value  getConstantsValues( int constant );
 
     int32_t getLongConstantIndexByOpCodeOffset( int offset );
-    Value getLoncConstantValues( uint32_t constant );
-    void  printValue( Value value );
+    Value   getLoncConstantValues( uint32_t constant );
+    void    printValue( Value value );
 
   public:
-    int  count;      // How many entries are used
-    int  capacity;   // Max capacity of entries
-    int* lines;      // Line information
+    int      count;      // How many entries are used
+    int      capacity;   // Max capacity of entries
+    int*     lines;      // Line information
+    uint8_t* code;       // Instructions
 
   private:
-    uint8_t*   code;        // Instructions
     ValueArray constants;   // Array to hold data of chunk
 };
