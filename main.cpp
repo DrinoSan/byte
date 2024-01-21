@@ -9,6 +9,7 @@ int main( int argc, const char* argv[] )
 
     Chunk chunk;
     chunk.writeConstant( 1.2, 123 );
+    chunk.writeChunk(OP_NEGATE, 123);
 
     // for ( int i = 0; i < 270; ++i )
     // {

@@ -9,6 +9,8 @@ set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g")
 set(CMAKE_CXX_COMPILER clang++)
 
+# add_definitions(-DDEBUG_TRACE_EXECUTION)
+
 
 # Create the executable target
 add_executable(main main.cpp chunk.cpp memory.cpp debug.cpp value.cpp vm.cpp)
