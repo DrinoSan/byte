@@ -2,8 +2,6 @@
 
 #include "chunk.h"
 #include "scanner.h"
-#include "vm.h"
-#include <_types/_uint8_t.h>
 
 class Parser
 {
@@ -28,6 +26,10 @@ class Compiler
 {
   public:
     Compiler()  = default;
+    Compiler( Scanner scanner, Parser parser, Chunk* compilingChunk )
+        : scanner( scanner ), parser( parser ), compilingChunk( compilingChunk )
+    {
+    }
     ~Compiler() = default;
 
     bool compile( const char* source, Chunk* chunk );

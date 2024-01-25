@@ -1,10 +1,9 @@
-#include <_types/_uint8_t.h>
 #include <cstdlib>
 #include <stdio.h>
 
+#include "compiler.h"
 #include "chunk.h"
 #include "common.h"
-#include "compiler.h"
 #include "scanner.h"
 
 void Parser::errorAtCurrent( const char* message )

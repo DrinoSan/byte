@@ -1,7 +1,7 @@
 #pragma once
 
-#include "chunk.h"
 #include "compiler.h"
+#include "chunk.h"
 #include "value.h"
 
 #define STACK_MAX 256
@@ -26,8 +26,8 @@ class VM
     void initVM();
     void freeVM();
 
-    void resetStack();
-    void push(Value value);
+    void  resetStack();
+    void  push( Value value );
     Value pop();
 
     InterpretResult interpret( const char* source );
