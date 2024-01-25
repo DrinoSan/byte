@@ -22,10 +22,25 @@ class Parser
     bool  panicMode;
 };
 
+enum class Precedence
+{
+    PREC_NONE,
+    PREC_ASSIGNMENT,   // =
+    PREC_OR,           // or
+    PREC_AND,          // and
+    PREC_EQUALITY,     // == !=
+    PREC_COMPARISON,   // < > <= >=
+    PREC_TERM,         // + -
+    PREC_FACTOR,       // * /
+    PREC_UNARY,        // ! -
+    PREC_CALL,         // . ()
+    PREC_PRIMARY
+};
+
 class Compiler
 {
   public:
-    Compiler()  = default;
+    Compiler() = default;
     Compiler( Scanner scanner, Parser parser, Chunk* compilingChunk )
         : scanner( scanner ), parser( parser ), compilingChunk( compilingChunk )
     {
@@ -41,13 +56,16 @@ class Compiler
     Chunk* currentChunk();
 
     void endCompiler();
+    void binary();
     void grouping();
     void number();
     void unary();
-    void expression();
-    void emitReturn();
-    int32_t makeConstant(Value value);
-    void emitConstant(Value value);
+    void parsePrecedence( Precedence precedence );
+
+    void    expression();
+    void    emitReturn();
+    int32_t makeConstant( Value value );
+    void    emitConstant( Value value );
 
   private:
     Scanner scanner;
