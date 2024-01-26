@@ -14,6 +14,7 @@ void Scanner::initScanner( const char* source )
 
 Token Scanner::scanToken()
 {
+
     skipWhitespace();
     start = current;
     if ( isAtEnd() )
@@ -23,7 +24,9 @@ Token Scanner::scanToken()
     if ( isAlpha( c ) )
         return identifier();
     if ( isDigit( c ) )
+    {
         return number();
+    }
 
     switch ( c )
     {
@@ -197,7 +200,7 @@ Token Scanner::number()
 
     while ( isDigit( peek() ) )
         advance();
-
+    
     return makeToken( TokenType::TOKEN_NUMBER );
 }
 

@@ -1,10 +1,15 @@
+#include <cstdio>
 #include <cstdlib>
 #include <stdio.h>
 
-#include "compiler.h"
 #include "chunk.h"
 #include "common.h"
+#include "compiler.h"
 #include "scanner.h"
+
+#ifdef DEBUG_PRINT_CODE
+#include "debug.h"
+#endif
 
 void Parser::errorAtCurrent( const char* message )
 {
@@ -54,6 +59,7 @@ bool Compiler::compile( const char* source, Chunk* chunk )
 
     advance();
     expression();
+    printf("SANDDDDDD\n");
     consume( TokenType::TOKEN_EOF, "Expected end of expression," );
 
     endCompiler();
@@ -104,6 +110,37 @@ Chunk* Compiler::currentChunk()
 void Compiler::endCompiler()
 {
     emitReturn();
+#ifdef DEBUG_PRINT_CODE
+    if ( !parser.hadError )
+    {
+        disassembleChunk( currentChunk(), "code" );
+    }
+#endif
+}
+
+void Compiler::binary()
+{
+    TokenType operatorType = parser.previous.type;
+    //   ParseRule* rule = getRule(operatorType);
+    //   parsePrecedence((Precedence)(rule->precedence + 1));
+
+    switch ( operatorType )
+    {
+    case TokenType::TOKEN_PLUS:
+        emitByte( OP_ADD );
+        break;
+    case TokenType::TOKEN_MINUS:
+        emitByte( OP_SUBTRACT );
+        break;
+    case TokenType::TOKEN_STAR:
+        emitByte( OP_MULTIPLY );
+        break;
+    case TokenType::TOKEN_SLASH:
+        emitByte( OP_DIVIDE );
+        break;
+    default:
+        return;   // Unreachable.
+    }
 }
 
 void Compiler::grouping()
@@ -114,6 +151,7 @@ void Compiler::grouping()
 
 void Compiler::number()
 {
+    printf("NUMBER NUMBER parser.previous.start:%s\n", parser.previous.start);
     double value = strtod( parser.previous.start, NULL );
     emitConstant( value );
 }
@@ -123,7 +161,7 @@ void Compiler::unary()
     TokenType operatorType = parser.previous.type;
 
     // Compile the operand
-    expression();
+    parsePrecedence( Precedence::PREC_UNARY );
 
     switch ( operatorType )
     {
@@ -136,6 +174,29 @@ void Compiler::unary()
     {
         return;
     }
+    }
+}
+
+void Compiler::parsePrecedence( Precedence precedence )
+{
+    advance();
+    ParseFn prefixRule = getRule( parser.previous.type )->prefix;
+    if ( prefixRule == NULL )
+    {
+        parser.error( "Expect expression." );
+        return;
+    }
+
+    printf("parser.previous.type: %d\n", parser.previous.type);
+    printf("parser.previous.start: %s\n", parser.previous.start);
+    printf("SANDOOOOOOOOOOO\n");
+    prefixRule();
+
+    while ( precedence <= getRule( parser.current.type )->precedence )
+    {
+        advance();
+        ParseFn infixRule = getRule( parser.previous.type )->infix;
+        infixRule();
     }
 }
 
@@ -154,4 +215,7 @@ void Compiler::emitConstant( Value value )
     emitBytes( OP_CONSTANT, makeConstant( value ) );
 }
 
-void Compiler::expression() {}
+void Compiler::expression()
+{
+    parsePrecedence( Precedence::PREC_ASSIGNMENT );
+}
