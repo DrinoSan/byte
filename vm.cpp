@@ -118,6 +118,7 @@ InterpretResult VM::run()
         }
         case OP_RETURN:
         {
+            // Pop the last in stack... hopefully
             chunk->printValue( pop() );
             printf( "\n" );
             return InterpretResult::INTERPRET_OK;

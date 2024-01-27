@@ -48,15 +48,9 @@ typedef struct
 class Compiler
 {
   public:
-    Compiler() { initializeRules(); }
+    Compiler() { printf( "Constructed Compiler\n" ); }
 
-    Compiler( Scanner scanner, Parser parser, Chunk* compilingChunk )
-        : scanner( scanner ), parser( parser ), compilingChunk( compilingChunk )
-    {
-        initializeRules();
-    }
-
-    ~Compiler() = default;
+    ~Compiler() { printf( "DESTROYED Compiler\n" ); };
 
     bool compile( const char* source, Chunk* chunk );
     void advance();
@@ -83,17 +77,18 @@ class Compiler
         rules.resize( static_cast<size_t>( TokenType::TOKEN_EOF ) + 1 );
 
         /* clang-format off */
-        rules[static_cast<size_t>(TokenType::TOKEN_LEFT_PAREN)]    = { std::bind(&Compiler::grouping, this), nullptr, Precedence::PREC_NONE };
+        // lambda > std::bind
+        rules[static_cast<size_t>(TokenType::TOKEN_LEFT_PAREN)]    = { [this]{grouping();}, nullptr, Precedence::PREC_NONE };
         rules[static_cast<size_t>(TokenType::TOKEN_RIGHT_PAREN)]   = { nullptr, nullptr, Precedence::PREC_NONE };
         rules[static_cast<size_t>(TokenType::TOKEN_LEFT_BRACE)]    = { nullptr, nullptr, Precedence::PREC_NONE };
         rules[static_cast<size_t>(TokenType::TOKEN_RIGHT_BRACE)]   = { nullptr, nullptr, Precedence::PREC_NONE };
         rules[static_cast<size_t>(TokenType::TOKEN_COMMA)]         = { nullptr, nullptr, Precedence::PREC_NONE };
         rules[static_cast<size_t>(TokenType::TOKEN_DOT)]           = { nullptr, nullptr, Precedence::PREC_NONE };
-        rules[static_cast<size_t>(TokenType::TOKEN_MINUS)]         = { std::bind(&Compiler::unary, this), std::bind(&Compiler::binary, this), Precedence::PREC_TERM };
-        rules[static_cast<size_t>(TokenType::TOKEN_PLUS)]          = { nullptr, std::bind(&Compiler::binary, this), Precedence::PREC_TERM };
+        rules[static_cast<size_t>(TokenType::TOKEN_MINUS)]         = { [this]{unary();}, [this]{binary();}, Precedence::PREC_TERM };
+        rules[static_cast<size_t>(TokenType::TOKEN_PLUS)]          = { nullptr, [this] {binary();}, Precedence::PREC_TERM };
         rules[static_cast<size_t>(TokenType::TOKEN_SEMICOLON)]     = { nullptr, nullptr, Precedence::PREC_NONE };
-        rules[static_cast<size_t>(TokenType::TOKEN_SLASH)]         = { nullptr,std::bind(&Compiler::binary, this), Precedence::PREC_FACTOR };
-        rules[static_cast<size_t>(TokenType::TOKEN_STAR)]          = { nullptr,std::bind(&Compiler::binary, this), Precedence::PREC_FACTOR };
+        rules[static_cast<size_t>(TokenType::TOKEN_SLASH)]         = { nullptr,[this]{binary();}, Precedence::PREC_FACTOR };
+        rules[static_cast<size_t>(TokenType::TOKEN_STAR)]          = { nullptr,[this]{binary();}, Precedence::PREC_FACTOR };
         rules[static_cast<size_t>(TokenType::TOKEN_BANG)]          = { nullptr, nullptr, Precedence::PREC_NONE };
         rules[static_cast<size_t>(TokenType::TOKEN_BANG_EQUAL)]    = { nullptr, nullptr, Precedence::PREC_NONE };
         rules[static_cast<size_t>(TokenType::TOKEN_EQUAL)]         = { nullptr, nullptr, Precedence::PREC_NONE };
@@ -104,7 +99,7 @@ class Compiler
         rules[static_cast<size_t>(TokenType::TOKEN_LESS_EQUAL)]    = { nullptr, nullptr, Precedence::PREC_NONE };
         rules[static_cast<size_t>(TokenType::TOKEN_IDENTIFIER)]    = { nullptr, nullptr, Precedence::PREC_NONE };
         rules[static_cast<size_t>(TokenType::TOKEN_STRING)]        = { nullptr, nullptr, Precedence::PREC_NONE };
-        rules[static_cast<size_t>(TokenType::TOKEN_NUMBER)]        = { std::bind(&Compiler::number, this), nullptr, Precedence::PREC_NONE };
+        rules[static_cast<size_t>(TokenType::TOKEN_NUMBER)]        = { [this]{number();}, nullptr, Precedence::PREC_NONE };
         rules[static_cast<size_t>(TokenType::TOKEN_AND)]           = { nullptr, nullptr, Precedence::PREC_NONE };
         rules[static_cast<size_t>(TokenType::TOKEN_CLASS)]         = { nullptr, nullptr, Precedence::PREC_NONE };
         rules[static_cast<size_t>(TokenType::TOKEN_ELSE)]          = { nullptr, nullptr, Precedence::PREC_NONE };

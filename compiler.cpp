@@ -59,7 +59,6 @@ bool Compiler::compile( const char* source, Chunk* chunk )
 
     advance();
     expression();
-    printf("SANDDDDDD\n");
     consume( TokenType::TOKEN_EOF, "Expected end of expression," );
 
     endCompiler();
@@ -121,8 +120,9 @@ void Compiler::endCompiler()
 void Compiler::binary()
 {
     TokenType operatorType = parser.previous.type;
-    //   ParseRule* rule = getRule(operatorType);
-    //   parsePrecedence((Precedence)(rule->precedence + 1));
+    initializeRules();
+      ParseRule* rule = getRule(operatorType);
+      parsePrecedence((Precedence)(static_cast<size_t>(rule->precedence) + 1));
 
     switch ( operatorType )
     {
@@ -151,7 +151,6 @@ void Compiler::grouping()
 
 void Compiler::number()
 {
-    printf("NUMBER NUMBER parser.previous.start:%s\n", parser.previous.start);
     double value = strtod( parser.previous.start, NULL );
     emitConstant( value );
 }
@@ -180,17 +179,15 @@ void Compiler::unary()
 void Compiler::parsePrecedence( Precedence precedence )
 {
     advance();
+    initializeRules();
     ParseFn prefixRule = getRule( parser.previous.type )->prefix;
     if ( prefixRule == NULL )
     {
         parser.error( "Expect expression." );
         return;
     }
-
-    printf("parser.previous.type: %d\n", parser.previous.type);
-    printf("parser.previous.start: %s\n", parser.previous.start);
-    printf("SANDOOOOOOOOOOO\n");
     prefixRule();
+    initializeRules();
 
     while ( precedence <= getRule( parser.current.type )->precedence )
     {

@@ -60,7 +60,9 @@ static void runFile( const char* path, VM& vm )
 
 int main( int argc, const char* argv[] )
 {
+    // Make singelton call initVM once somehow
     VM vm = VM::getInstance();
+    vm.initVM();
 
     if ( argc == 1 )
     {

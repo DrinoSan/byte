@@ -61,13 +61,14 @@ void Chunk::printValue( Value value )
     constants.printValue( value );
 }
 
+// TODO make me not write a opcode for > uint8_max, its late i am tired
 int32_t Chunk::writeConstant( Value value, int line )
 {
     int index = addConstant( value );
     if ( index < UINT8_MAX )
     {
-        writeChunk( OP_CONSTANT, line );
-        writeChunk( index, line );
+        // writeChunk( OP_CONSTANT, line );
+        // writeChunk( index, line );
 
         return index;
     }
