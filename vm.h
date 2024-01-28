@@ -1,7 +1,8 @@
 #pragma once
 
-#include "compiler.h"
 #include "chunk.h"
+#include "compiler.h"
+#include "scanner.h"
 #include "value.h"
 
 #define STACK_MAX 256
@@ -27,8 +28,10 @@ class VM
     void freeVM();
 
     void  resetStack();
+    void  runtimeError( const char* format, ... );
     void  push( Value value );
     Value pop();
+    Value peek( int distance );
 
     InterpretResult interpret( const char* source );
     InterpretResult run();
@@ -45,4 +48,5 @@ class VM
     Value    stack[ STACK_MAX ];
     Value*   stackTop;
     Compiler compiler;
+    Scanner  scanner;
 };

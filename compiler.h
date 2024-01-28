@@ -70,6 +70,7 @@ class Compiler
     void binary();
     void grouping();
     void number();
+    void literal();
     void unary();
 
     void initializeRules()
@@ -103,17 +104,17 @@ class Compiler
         rules[static_cast<size_t>(TokenType::TOKEN_AND)]           = { nullptr, nullptr, Precedence::PREC_NONE };
         rules[static_cast<size_t>(TokenType::TOKEN_CLASS)]         = { nullptr, nullptr, Precedence::PREC_NONE };
         rules[static_cast<size_t>(TokenType::TOKEN_ELSE)]          = { nullptr, nullptr, Precedence::PREC_NONE };
-        rules[static_cast<size_t>(TokenType::TOKEN_FALSE)]         = { nullptr, nullptr, Precedence::PREC_NONE };
+        rules[static_cast<size_t>(TokenType::TOKEN_FALSE)]         = { [this] {literal();}, nullptr, Precedence::PREC_NONE };
         rules[static_cast<size_t>(TokenType::TOKEN_FOR)]           = { nullptr, nullptr, Precedence::PREC_NONE };
         rules[static_cast<size_t>(TokenType::TOKEN_FUN)]           = { nullptr, nullptr, Precedence::PREC_NONE };
         rules[static_cast<size_t>(TokenType::TOKEN_IF)]            = { nullptr, nullptr, Precedence::PREC_NONE };
-        rules[static_cast<size_t>(TokenType::TOKEN_NIL)]           = { nullptr, nullptr, Precedence::PREC_NONE };
+        rules[static_cast<size_t>(TokenType::TOKEN_NIL)]           = { [this] {literal();}, nullptr, Precedence::PREC_NONE };
         rules[static_cast<size_t>(TokenType::TOKEN_OR)]            = { nullptr, nullptr, Precedence::PREC_NONE };
         rules[static_cast<size_t>(TokenType::TOKEN_PRINT)]         = { nullptr, nullptr, Precedence::PREC_NONE };
         rules[static_cast<size_t>(TokenType::TOKEN_RETURN)]        = { nullptr, nullptr, Precedence::PREC_NONE };
         rules[static_cast<size_t>(TokenType::TOKEN_SUPER)]         = { nullptr, nullptr, Precedence::PREC_NONE };
         rules[static_cast<size_t>(TokenType::TOKEN_THIS)]          = { nullptr, nullptr, Precedence::PREC_NONE };
-        rules[static_cast<size_t>(TokenType::TOKEN_TRUE)]          = { nullptr, nullptr, Precedence::PREC_NONE };
+        rules[static_cast<size_t>(TokenType::TOKEN_TRUE)]          = { [this] {literal();}, nullptr, Precedence::PREC_NONE };
         rules[static_cast<size_t>(TokenType::TOKEN_VAR)]           = { nullptr, nullptr, Precedence::PREC_NONE };
         rules[static_cast<size_t>(TokenType::TOKEN_WHILE)]         = { nullptr, nullptr, Precedence::PREC_NONE };
         rules[static_cast<size_t>(TokenType::TOKEN_ERROR)]         = { nullptr, nullptr, Precedence::PREC_NONE };

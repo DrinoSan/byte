@@ -6,6 +6,7 @@
 #include "common.h"
 #include "compiler.h"
 #include "scanner.h"
+#include "value.h"
 
 #ifdef DEBUG_PRINT_CODE
 #include "debug.h"
@@ -121,8 +122,9 @@ void Compiler::binary()
 {
     TokenType operatorType = parser.previous.type;
     initializeRules();
-      ParseRule* rule = getRule(operatorType);
-      parsePrecedence((Precedence)(static_cast<size_t>(rule->precedence) + 1));
+    ParseRule* rule = getRule( operatorType );
+    parsePrecedence(
+        ( Precedence ) ( static_cast<size_t>( rule->precedence ) + 1 ) );
 
     switch ( operatorType )
     {
@@ -152,7 +154,25 @@ void Compiler::grouping()
 void Compiler::number()
 {
     double value = strtod( parser.previous.start, NULL );
-    emitConstant( value );
+    emitConstant( NUMBER_VAL( value ) );
+}
+
+void Compiler::literal()
+{
+    switch ( parser.previous.type )
+    {
+    case TokenType::TOKEN_FALSE:
+        emitByte( OP_FALSE );
+        break;
+    case TokenType::TOKEN_NIL:
+        emitByte( OP_NIL );
+        break;
+    case TokenType::TOKEN_TRUE:
+        emitByte( OP_TRUE );
+        break;
+    default:
+        return;   // Unreachable.
+    }
 }
 
 void Compiler::unary()

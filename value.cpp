@@ -28,18 +28,29 @@ void ValueArray::writeValueArray( Value value )
 
 void ValueArray::freeValueArray()
 {
-    FREE_ARRAY<Value>(values, capacity);
+    FREE_ARRAY<Value>( values, capacity );
     initValueArray();
 }
 
-void ValueArray::printValue(Value value)
+void ValueArray::printValue( Value value )
 {
-    printf("%g", value);
+    switch ( value.type )
+    {
+    case VAL_BOOL:
+        printf( AS_BOOL( value ) ? "true" : "false" );
+        break;
+    case VAL_NIL:
+        printf( "nil" );
+        break;
+    case VAL_NUMBER:
+        printf( "%g", AS_NUMBER( value ) );
+        break;
+    }
 }
 
 void ValueArray::initValueArray()
 {
-    values = nullptr;
+    values   = nullptr;
     capacity = 0;
-    count = 0;
+    count    = 0;
 }

@@ -1,7 +1,10 @@
+#include <cstdarg>
+#include <stdarg.h>
 #include <stdio.h>
 
 #include "common.h"
 #include "debug.h"
+#include "value.h"
 #include "vm.h"
 
 VM::VM()
@@ -43,6 +46,20 @@ void VM::resetStack()
     stackTop = stack;
 }
 
+void VM::runtimeError( const char* format, ... )
+{
+    va_list args;
+    va_start( args, format );
+    vfprintf( stderr, format, args );
+    va_end( args );
+    fputs( "\n", stderr );
+
+    size_t instruction = ip - chunk->code - 1;
+    int    line        = chunk->lines[ instruction ];
+    fprintf( stderr, "[line %d] in script\n", line );
+    resetStack();
+}
+
 void VM::push( Value value )
 {
     *stackTop = value;
@@ -54,18 +71,28 @@ Value VM::pop()
     return *( --stackTop );
 }
 
+Value VM::peek( int distance )
+{
+    return stackTop[ -1 - distance ];
+}
+
 InterpretResult VM::run()
 {
 #define READ_BYTE()     ( *ip++ )
 #define READ_CONSTANT() ( chunk->getConstantsValues( READ_BYTE() ) )
 // The use of a do while loop enables us to contain multiple statements inside a
 // block but also enables us to add a semicolon at the end
-#define BINARY_OP( op )                                                        \
+#define BINARY_OP( valueType, op )                                             \
     do                                                                         \
     {                                                                          \
-        double b = pop();                                                      \
-        double a = pop();                                                      \
-        push( a op b );                                                        \
+        if ( !IS_NUMBER( peek( 0 ) ) || !IS_NUMBER( peek( 1 ) ) )              \
+        {                                                                      \
+            runtimeError( "Operands must be numbers." );                       \
+            return InterpretResult::INTERPRET_RUNTIME_ERROR;                   \
+        }                                                                      \
+        double b = AS_NUMBER( pop() );                                         \
+        double a = AS_NUMBER( pop() );                                         \
+        push( valueType( a op b ) );                                           \
     } while ( false )
 
     for ( ;; )
@@ -91,29 +118,44 @@ InterpretResult VM::run()
             push( constant );
             break;
         }
+        case OP_NIL:
+            push( NIL_VAL );
+            break;
+        case OP_TRUE:
+            push( BOOL_VAL( true ) );
+            break;
+        case OP_FALSE:
+            push( BOOL_VAL( false ) );
+            break;
         case OP_ADD:
         {
-            BINARY_OP( +);
+            BINARY_OP( NUMBER_VAL, +);
             break;
         }
         case OP_SUBTRACT:
         {
-            BINARY_OP( -);
+            BINARY_OP( NUMBER_VAL, -);
             break;
         }
         case OP_MULTIPLY:
         {
-            BINARY_OP( * );
+            BINARY_OP( NUMBER_VAL, * );
             break;
         }
         case OP_DIVIDE:
         {
-            BINARY_OP( / );
+            BINARY_OP( NUMBER_VAL, / );
             break;
         }
         case OP_NEGATE:
         {
-            push( -pop() );
+            if ( !IS_NUMBER( peek( 0 ) ) )
+            {
+                runtimeError( "Operand must be a number." );
+                return InterpretResult::INTERPRET_RUNTIME_ERROR;
+            }
+            push( NUMBER_VAL( -AS_NUMBER( pop() ) ) );
+            break;
             break;
         }
         case OP_RETURN:
